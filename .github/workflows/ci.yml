@@ -3,27 +3,47 @@ name: CI Pipeline
 on:
   push:
     branches:
-      -master
+      - master
+
 jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d app"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/app
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
       - name: Install dependencies
         run: uv sync
 
+      - name: Run migrations
+        run: uv run alembic upgrade head
+
       - name: Run tests
         run: uv run pytest
-
-          
