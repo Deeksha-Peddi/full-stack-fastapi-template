@@ -40,6 +40,15 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Build frontend
+        working-directory: frontend
+        run: |
+          bun install
+          bun run build
+
       - name: Install uv
         uses: astral-sh/setup-uv@v6
 
