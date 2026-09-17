@@ -31,6 +31,7 @@ jobs:
       FIRST_SUPERUSER: admin@example.com
       FIRST_SUPERUSER_PASSWORD: ci-test-password
       EMAILS_FROM_EMAIL: test@example.com
+      FASTAPI_ENV: development
 
     steps:
       - name: Checkout code
