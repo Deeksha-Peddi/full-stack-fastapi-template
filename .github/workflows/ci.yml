@@ -83,3 +83,20 @@ jobs:
 
       - name: Push Docker image
         run: docker push deeksha29/fp:latest
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            cd ~/full-stack-fastapi-template
+            docker pull deeksha29/fp:latest
+            docker compose --env-file .env -f compose.ec2.yml up -d --force-recreate backend
